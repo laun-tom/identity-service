@@ -34,6 +34,6 @@ public class AuthController {
     public ResponseEntity<AuthResponse> callback(
             @RequestParam String code,
             @RequestParam String codeVerifier) {
-        return ResponseEntity.ok(authService.handleCallback(code, codeVerifier));
+        return ResponseEntity.ok(authService.handleCallback("line", code, codeVerifier));
     }
 }
