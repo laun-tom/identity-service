@@ -1,52 +1,56 @@
 package com.own.identity_service.service;
 
-import com.own.identity_service.config.oauth2.GoogleConfig;
-import com.own.identity_service.config.oauth2.LineConfig;
 import com.own.identity_service.domain.User;
-import com.own.identity_service.domain.enumeration.AuthProvider;
 import com.own.identity_service.dto.AuthResponse;
 import com.own.identity_service.dto.OAuth2Profile;
-import com.own.identity_service.dto.LineTokenResponse;
 import com.own.identity_service.mapper.UserMapper;
-import com.own.identity_service.util.LineApiClient;
-import lombok.RequiredArgsConstructor;
+import com.own.identity_service.service.oauth2.OAuth2Provider;
+import com.own.identity_service.util.annotation.ProviderType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class AuthService {
-    private final LineApiClient lineApiClient;
+    private final Map<String, OAuth2Provider> providers;
     private final JwtService jwtService;
-    private final LineConfig lineConfig;
-    private final GoogleConfig googleConfig;
     private final UserService userService;
     private final UserMapper userMapper;
 
-    public String generateAuthUrl(String state, String loginType) {
-        UriComponentsBuilder authUrl = switch (loginType.toLowerCase()) {
-            case "line" -> UriComponentsBuilder.fromUriString(lineConfig.getAuthUrl())
-                    .queryParam("client_id", lineConfig.getClientId())
-                    .queryParam("redirect_uri", lineConfig.getRedirectUri());
-            case "google" -> UriComponentsBuilder.fromUriString(googleConfig.getAuthUrl())
-                    .queryParam("client_id", googleConfig.getClientId())
-                    .queryParam("redirect_uri", googleConfig.getRedirectUri());
-            default -> throw new IllegalArgumentException("Unsupported login type: " + loginType);
-        };
-        return authUrl
-                .queryParam("response_type", "code")
-                .queryParam("state", state)
-                .queryParam("scope", "profile%20openid%20email")
-                .queryParam("code_challenge_method", "S256")
-                .build()
-                .toUriString();
+    public AuthService(
+            List<OAuth2Provider> providerList,
+            JwtService jwtService,
+            UserService userService,
+            UserMapper userMapper
+    ) {
+        this.providers = providerList.stream()
+                .collect(Collectors.toMap(
+                        p -> p.getClass().getAnnotation(ProviderType.class).value(),
+                        p -> p
+                ));
+        this.jwtService = jwtService;
+        this.userService = userService;
+        this.userMapper = userMapper;
     }
 
-    public AuthResponse handleCallback(String code, String codeVerifier) {
-        LineTokenResponse tokenResponse = lineApiClient.exchangeCode(code, codeVerifier);
-        OAuth2Profile profile = jwtService.verifyIdToken(tokenResponse.getIdToken());
-        profile.setProvider(AuthProvider.LINE);
-        User user = this.userService.oAuth2Login(this.userMapper.toUser(profile));
+    public String generateAuthUrl(String state, String providerType) {
+        OAuth2Provider provider = providers.get(providerType.toLowerCase());
+        if (provider == null) {
+            throw new IllegalArgumentException("Unsupported provider: " + providerType);
+        }
+        return provider.generateAuthUrl(state);
+    }
+
+    public AuthResponse handleCallback(String providerType, String code, String codeVerifier) {
+        OAuth2Provider provider = providers.get(providerType.toLowerCase());
+        if (provider == null) {
+            throw new IllegalArgumentException("Unsupported provider: " + providerType);
+        }
+
+        OAuth2Profile profile = provider.handleCallBack(code, codeVerifier);
+        User user = userService.oAuth2Login(userMapper.toUser(profile));
 
         return AuthResponse.builder()
                 .user(user)
