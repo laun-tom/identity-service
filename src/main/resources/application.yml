@@ -1,0 +1,40 @@
+server:
+  port: 8088
+spring:
+  application:
+    name: identity-service
+  datasource:
+    url: ${DBMS_CONNECTION:jdbc:mysql://localhost:3306/identity_service}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DBMS_USERNAME:root}
+    password: ${DBMS_PASSWORD:123456}
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+      format_sql: true
+      dialect: org.hibernate.dialect.MySQL8Dialect
+logging:
+  level:
+    org.springframework.web: DEBUG
+line:
+  login:
+    client-id: ${LINE_CLIENT_ID}
+    client-secret: ${LINE_CLIENT_SECRET}
+    redirect-uri: http://localhost:5173/login/oauth2/code/line
+    token-url: https://api.line.me/oauth2/v2.1/token
+    auth-url: https://access.line.me/oauth2/v2.1/authorize
+    verify-url: https://api.line.me/oauth2/v2.1/verify
+google:
+  login:
+    client-id: ${GOOGLE_CLIENT_ID}
+    client-secret: ${GOOGLE_CLIENT_SECRET}
+    redirect-uri: http://localhost:5173/login/oauth2/code/google
+    token-url: https://oauth2.googleapis.com/token
+    auth-url: https://accounts.google.com/o/oauth2/auth
+    verify-url: https://www.googleapis.com/oauth2/v3/userinfo
+    scope: openid email profile
+api:
+  prefix: /api
