@@ -33,7 +33,8 @@ public class AuthController {
     @GetMapping("/callback")
     public ResponseEntity<AuthResponse> callback(
             @RequestParam String code,
+            @RequestParam("providerType") String providerType,
             @RequestParam String codeVerifier) {
-        return ResponseEntity.ok(authService.handleCallback("line", code, codeVerifier));
+        return ResponseEntity.ok(authService.handleCallback(providerType, code, codeVerifier));
     }
 }

@@ -23,7 +23,7 @@ line:
   login:
     client-id: ${LINE_CLIENT_ID}
     client-secret: ${LINE_CLIENT_SECRET}
-    redirect-uri: http://localhost:5173/login/oauth2/code/line
+    redirect-uri: http://localhost:5173/login/oauth2/code/line?type=line
     token-url: https://api.line.me/oauth2/v2.1/token
     auth-url: https://access.line.me/oauth2/v2.1/authorize
     verify-url: https://api.line.me/oauth2/v2.1/verify
@@ -31,7 +31,7 @@ google:
   login:
     client-id: ${GOOGLE_CLIENT_ID}
     client-secret: ${GOOGLE_CLIENT_SECRET}
-    redirect-uri: http://localhost:5173/login/oauth2/code/google
+    redirect-uri: http://localhost:5173/login/oauth2/code/google?type=google
     token-url: https://oauth2.googleapis.com/token
     auth-url: https://accounts.google.com/o/oauth2/auth
     verify-url: https://www.googleapis.com/oauth2/v3/userinfo

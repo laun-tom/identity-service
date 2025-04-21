@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class LineTokenResponse {
+public class OAuth2TokenResponse {
     @JsonProperty("access_token")
     private String accessToken;
 
