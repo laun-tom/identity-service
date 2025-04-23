@@ -27,6 +27,9 @@ line:
     token-url: https://api.line.me/oauth2/v2.1/token
     auth-url: https://access.line.me/oauth2/v2.1/authorize
     verify-url: https://api.line.me/oauth2/v2.1/verify
+  bot:
+    channel-secret: ${CHANNEL_SECRET}
+    channel-token: ${CHANNEL_TOKEN}
 google:
   login:
     client-id: ${GOOGLE_CLIENT_ID}
