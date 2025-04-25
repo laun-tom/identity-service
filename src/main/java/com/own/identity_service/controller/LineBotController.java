@@ -7,6 +7,7 @@ import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.event.FollowEvent;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
+import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.StickerMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
@@ -14,9 +15,14 @@ import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import com.own.identity_service.domain.User;
 import com.own.identity_service.domain.UserFollowed;
 import com.own.identity_service.repository.UserFollowedResponse;
+import com.own.identity_service.service.richmenu.FlexMessageService;
+import com.own.identity_service.service.richmenu.RichMenuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.net.URISyntaxException;
 
 @Slf4j
 @LineMessageHandler
@@ -25,10 +31,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class LineBotController {
     private final LineMessagingClient lineMessagingClient;
     private final UserFollowedResponse userFollowedResponse;
+    private final FlexMessageService flexMessageService;
 
     @EventMapping
-
-    public void handleTextMessage(MessageEvent<TextMessageContent> event) {
+    public void handleTextMessage(MessageEvent<TextMessageContent> event) throws URISyntaxException {
         String senderId = event.getSource().getUserId();
         String replyToken = event.getReplyToken();
         String userMessage = event.getMessage().getText();
@@ -50,6 +56,10 @@ public class LineBotController {
 //                        new TextMessage(userMessage)
 //                )
 //        );
+        if (userMessage.equalsIgnoreCase("clean")) {
+            FlexMessage flexMessage = this.flexMessageService.sendCameraFlexMessage();
+            lineMessagingClient.broadcast( new Broadcast(flexMessage));
+        }
         TextMessage message = new TextMessage(userMessage);
         lineMessagingClient.broadcast( new Broadcast(message));
     }
@@ -62,4 +72,6 @@ public class LineBotController {
                 .build();
         this.userFollowedResponse.save(userFollowed);
     }
+
+
 }

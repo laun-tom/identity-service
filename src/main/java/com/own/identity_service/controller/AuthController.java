@@ -5,6 +5,7 @@ import com.own.identity_service.dto.AuthResponse;
 import com.own.identity_service.dto.UserDto;
 import com.own.identity_service.service.AuthService;
 import com.own.identity_service.service.UserService;
+import com.own.identity_service.service.richmenu.RichMenuService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class AuthController {
     private final AuthService authService;
     private final UserService userService;
+    private final RichMenuService richMenuService;
 
     @GetMapping("/login")
     public ResponseEntity<String> getAuthUrl(@RequestParam("loginType") String loginType) {
@@ -36,5 +38,10 @@ public class AuthController {
             @RequestParam("providerType") String providerType,
             @RequestParam String codeVerifier) {
         return ResponseEntity.ok(authService.handleCallback(providerType, code, codeVerifier));
+    }
+
+    @GetMapping("/rich-menu")
+    public void richMenu() throws Exception {
+        richMenuService.createAndLinkRichMenu();
     }
 }
