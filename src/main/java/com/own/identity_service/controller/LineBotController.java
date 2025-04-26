@@ -2,27 +2,24 @@ package com.own.identity_service.controller;
 
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.Broadcast;
-import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.ReplyMessage;
 import com.linecorp.bot.model.event.FollowEvent;
 import com.linecorp.bot.model.event.MessageEvent;
+import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.FlexMessage;
-import com.linecorp.bot.model.message.StickerMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
-import com.own.identity_service.domain.User;
 import com.own.identity_service.domain.UserFollowed;
 import com.own.identity_service.repository.UserFollowedResponse;
 import com.own.identity_service.service.richmenu.FlexMessageService;
-import com.own.identity_service.service.richmenu.RichMenuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.net.URISyntaxException;
+import java.util.Map;
 
 @Slf4j
 @LineMessageHandler
@@ -60,8 +57,10 @@ public class LineBotController {
             FlexMessage flexMessage = this.flexMessageService.sendCameraFlexMessage();
             lineMessagingClient.broadcast( new Broadcast(flexMessage));
         }
-        TextMessage message = new TextMessage(userMessage);
-        lineMessagingClient.broadcast( new Broadcast(message));
+        else {
+            TextMessage message = new TextMessage(userMessage);
+            lineMessagingClient.broadcast(new Broadcast(message));
+        }
     }
 
     @EventMapping
@@ -71,6 +70,22 @@ public class LineBotController {
                 .userId(userId)
                 .build();
         this.userFollowedResponse.save(userFollowed);
+    }
+
+    @EventMapping
+    public void handlePostBackEvent(PostbackEvent event) {
+        String data = event.getPostbackContent().getData(); // "Booking"
+        Map<String, String> datetimeResult = event.getPostbackContent().getParams();
+
+        // 2. Xử lý theo loại action
+        if ("Booking".equals(data)) {
+            String selectedDatetime = datetimeResult.get("datetime"); // "2025-04-26T11:38"
+            String userId = event.getSource().getUserId();
+
+            lineMessagingClient.replyMessage(
+                new ReplyMessage(event.getReplyToken(), new TextMessage("✅ Đã đặt lịch vào: " + selectedDatetime))
+        );
+        }
     }
 
 

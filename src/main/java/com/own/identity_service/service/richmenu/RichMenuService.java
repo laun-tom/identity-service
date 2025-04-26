@@ -1,6 +1,8 @@
 package com.own.identity_service.service.richmenu;
 
 import com.linecorp.bot.client.LineMessagingClient;
+import com.linecorp.bot.model.action.DatetimePickerAction;
+import com.linecorp.bot.model.action.DatetimePickerAction.OfLocalDatetime;
 import com.linecorp.bot.model.action.MessageAction;
 import com.linecorp.bot.model.richmenu.*;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +12,11 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.time.InstantSource;
 import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -44,7 +49,13 @@ public class RichMenuService {
                         ),
                         new RichMenuArea(
                                 new RichMenuBounds(119, 945, 665, 631),
-                                new MessageAction("Knowledge", "Knowledge")
+                                DatetimePickerAction.OfLocalDatetime.builder()
+                                        .label("Booking")
+                                        .data("Booking")
+                                        .initial(LocalDateTime.now())
+                                        .min(LocalDateTime.of(2000, 1, 1, 0, 0))
+                                        .max(LocalDateTime.of(2099, 1, 1, 0, 0))
+                                        .build()
                         ),
                         new RichMenuArea(
                                 new RichMenuBounds(911, 962, 670, 619),

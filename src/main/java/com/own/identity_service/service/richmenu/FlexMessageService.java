@@ -1,19 +1,12 @@
 package com.own.identity_service.service.richmenu;
 
 import com.linecorp.bot.client.LineMessagingClient;
-import com.linecorp.bot.model.PushMessage;
-import com.linecorp.bot.model.action.MessageAction;
-import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.message.FlexMessage;
-import com.linecorp.bot.model.message.flex.component.*;
 import com.linecorp.bot.model.message.flex.container.Bubble;
 import com.linecorp.bot.model.message.flex.container.Carousel;
-import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
@@ -38,8 +31,22 @@ public class FlexMessageService {
                 "179"
         );
 
+        Bubble bubble3 = BubbleUtil.createFlexMessage("https://images.pexels.com/photos/8983137/pexels-photo-8983137.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+                "Len Canon EF 24-105mm F4",
+                "Chống rung hình ảnh IS, công nghệ lấy nét siêu thanh USM",
+                "https://www.thegioimayanhso.vn/fujifilm-x-s10-body",
+                "87.45"
+        );
+
+        Bubble bubble4 = BubbleUtil.createFlexMessage("https://images.pexels.com/photos/20094298/pexels-photo-20094298/free-photo-of-camera-on-white-background.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+                "Fujifilm X-T3",
+                "Quay video UHD 4K60; F-Log Gamma & 10-bit Out, Kính ngắm điện tử 0,75x 3,69m-Dot",
+                "https://fujifilmshop.vn/shop/fujifilm-x-t3/",
+                "187.45"
+        );
+
         Carousel carousel = Carousel.builder()
-                .contents(Arrays.asList(bubble1, bubble2))
+                .contents(Arrays.asList(bubble1, bubble2, bubble3, bubble4))
                 .build();
         return new FlexMessage(
                 "Thông tin",
